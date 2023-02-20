@@ -1,10 +1,47 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+let todos = [];
 const router = (0, express_1.Router)();
-const todos = [];
 router.get("/", (req, res, next) => {
     res.status(200).json({
+        todos: todos,
+    });
+});
+router.post("/todo", (req, res, next) => {
+    const newTodo = {
+        id: new Date().toISOString(),
+        text: req.body.text,
+    };
+    todos.push(newTodo);
+    res.status(201).json({
+        message: "success add todo",
+        todo: newTodo,
+        todos: todos,
+    });
+});
+router.put("/todo/:todoId", (req, res, next) => {
+    const id = req.params.todoId;
+    const todoIndex = todos.findIndex((todoItem) => todoItem.id === id);
+    if (todoIndex >= 0) {
+        todos[todoIndex] = {
+            id: todos[todoIndex].id,
+            text: req.body.text,
+        };
+        return res.status(201).json({
+            message: "updated todo",
+            todo: todos[todoIndex],
+            todos: todos,
+        });
+    }
+    res.status(404).json({
+        message: "cannot find todo",
+    });
+});
+router.put("/todos/:todoId", (req, res, next) => {
+    todos = todos.filter((todoItem) => todoItem.id !== req.params.todoId);
+    return res.status(201).json({
+        message: "deleted todo",
         todos: todos,
     });
 });

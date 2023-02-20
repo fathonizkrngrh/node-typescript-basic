@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { Todo } from "../models/todo";
 
-const todos: Todo[] = [];
+let todos: Todo[] = [];
 
 const router = Router();
 
@@ -20,19 +20,41 @@ router.post("/todo", (req, res, next) => {
 
   todos.push(newTodo);
 
-  res.status(200).json({
+  res.status(201).json({
     message: "success add todo",
+    todo: newTodo,
     todos: todos,
   });
 });
 
 router.put("/todo/:todoId", (req, res, next) => {
-  const newTodo: Todo = {
-    id: new Date().toISOString(),
-    text: req.body.text,
-  };
+  const id = req.params.todoId;
+  const todoIndex = todos.findIndex((todoItem) => todoItem.id === id);
 
-  todos.push(newTodo);
+  if (todoIndex >= 0) {
+    todos[todoIndex] = {
+      id: todos[todoIndex].id,
+      text: req.body.text,
+    };
+
+    return res.status(201).json({
+      message: "updated todo",
+      todo: todos[todoIndex],
+      todos: todos,
+    });
+  }
+
+  res.status(404).json({
+    message: "cannot find todo",
+  });
+});
+
+router.put("/todos/:todoId", (req, res, next) => {
+  todos = todos.filter((todoItem) => todoItem.id !== req.params.todoId);
+  return res.status(201).json({
+    message: "deleted todo",
+    todos: todos,
+  });
 });
 
 export default router;
