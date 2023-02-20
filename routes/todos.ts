@@ -49,7 +49,7 @@ router.put("/todo/:todoId", (req, res, next) => {
   });
 });
 
-router.put("/todos/:todoId", (req, res, next) => {
+router.delete("/todo/:todoId", (req, res, next) => {
   todos = todos.filter((todoItem) => todoItem.id !== req.params.todoId);
   return res.status(201).json({
     message: "deleted todo",
